@@ -249,6 +249,25 @@ const FleetPage: React.FC = () => {
     { name: 'Idle', value: stats.idle, color: '#EF4444' },
   ];
 
+  // Calculate marker positions with offsets to avoid overlapping
+  const markerPositions = useMemo(() => {
+    const positionMap: { [key: string]: Vehicle[] } = {};
+    filteredVehicles.forEach(vehicle => {
+      const key = `${vehicle.lat},${vehicle.lng}`;
+      if (!positionMap[key]) positionMap[key] = [];
+      positionMap[key].push(vehicle);
+    });
+
+    const positions: { [id: number]: [number, number] } = {};
+    Object.values(positionMap).forEach(group => {
+      group.forEach((vehicle, index) => {
+        const offset = group.length > 1 ? 0.005 * index : 0; // small offset in degrees
+        positions[vehicle.id] = [vehicle.lat + offset, vehicle.lng + offset];
+      });
+    });
+    return positions;
+  }, [filteredVehicles]);
+
   const efficiencyData = [
     { month: 'Jan', efficiency: 85 },
     { month: 'Feb', efficiency: 88 },
@@ -490,7 +509,7 @@ const FleetPage: React.FC = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           {filteredVehicles.map((vehicle) => (
-            <Marker key={vehicle.id} position={[vehicle.lat, vehicle.lng]}>
+            <Marker key={vehicle.id} position={markerPositions[vehicle.id]}>
               <Popup>
                 <div>
                   <h4 className="font-semibold">{vehicle.vehicleId} - {vehicle.type}</h4>
