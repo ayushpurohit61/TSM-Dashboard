@@ -249,25 +249,6 @@ const FleetPage: React.FC = () => {
     { name: 'Idle', value: stats.idle, color: '#EF4444' },
   ];
 
-  // Calculate marker positions with offsets to avoid overlapping
-  const markerPositions = useMemo(() => {
-    const positionMap: { [key: string]: Vehicle[] } = {};
-    filteredVehicles.forEach(vehicle => {
-      const key = `${vehicle.lat},${vehicle.lng}`;
-      if (!positionMap[key]) positionMap[key] = [];
-      positionMap[key].push(vehicle);
-    });
-
-    const positions: { [id: number]: [number, number] } = {};
-    Object.values(positionMap).forEach(group => {
-      group.forEach((vehicle, index) => {
-        const offset = group.length > 1 ? 0.005 * index : 0; // small offset in degrees
-        positions[vehicle.id] = [vehicle.lat + offset, vehicle.lng + offset];
-      });
-    });
-    return positions;
-  }, [filteredVehicles]);
-
   const efficiencyData = [
     { month: 'Jan', efficiency: 85 },
     { month: 'Feb', efficiency: 88 },
@@ -388,25 +369,25 @@ const FleetPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Stats Cards */}  
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 hover:shadow-lg transition">
+        <div className="bg-white shadow rounded-xl p-4 hover:shadow-lg transition">
           <h3 className="text-lg font-semibold">Total Vehicles</h3>
           <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 hover:shadow-lg transition">
+        <div className="bg-white shadow rounded-xl p-4 hover:shadow-lg transition">
           <h3 className="text-lg font-semibold">Active</h3>
           <p className="text-3xl font-bold text-green-600">{stats.active}</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 hover:shadow-lg transition">
+        <div className="bg-white shadow rounded-xl p-4 hover:shadow-lg transition">
           <h3 className="text-lg font-semibold">In Transit</h3>
           <p className="text-3xl font-bold text-blue-600">{stats.inTransit}</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 hover:shadow-lg transition">
+        <div className="bg-white shadow rounded-xl p-4 hover:shadow-lg transition">
           <h3 className="text-lg font-semibold">Maintenance</h3>
           <p className="text-3xl font-bold text-yellow-600">{stats.maintenance}</p>
         </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 hover:shadow-lg transition">
+        <div className="bg-white shadow rounded-xl p-4 hover:shadow-lg transition">
           <h3 className="text-lg font-semibold">Idle</h3>
           <p className="text-3xl font-bold text-red-600">{stats.idle}</p>
         </div>
@@ -414,7 +395,7 @@ const FleetPage: React.FC = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
+        <div className="bg-white shadow rounded-xl p-4">
           <h3 className="text-lg font-semibold mb-4">Fleet Status Distribution</h3>
           <PieChart width={400} height={300}>
             <Pie
@@ -422,7 +403,6 @@ const FleetPage: React.FC = () => {
               cx={200}
               cy={150}
               labelLine={false}
-              label={({ name, percent }) => `${name} ${((percent as number) * 100).toFixed(0)}%`}
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
@@ -434,7 +414,7 @@ const FleetPage: React.FC = () => {
             <Tooltip />
           </PieChart>
         </div>
-        <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
+        <div className="bg-white shadow rounded-xl p-4">
           <h3 className="text-lg font-semibold mb-4">Fleet Efficiency Trend</h3>
           <LineChart width={400} height={300} data={efficiencyData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -448,7 +428,7 @@ const FleetPage: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 mb-6">
+      <div className="bg-white shadow rounded-xl p-4 mb-6">
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-64">
             <div className="relative">
@@ -456,14 +436,14 @@ const FleetPage: React.FC = () => {
               <input
                 type="text"
                 placeholder="Search by Vehicle ID, Driver, Location..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg"
                 value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
               />
             </div>
           </div>
           <select
-            className="border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
+            className="border rounded-lg px-3 py-2"
             value={filters.type}
             onChange={(e) => setFilters({ ...filters, type: e.target.value })}
             aria-label="Filter by vehicle type"
@@ -474,7 +454,7 @@ const FleetPage: React.FC = () => {
             <option value="Container">Container</option>
           </select>
           <select
-            className="border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
+            className="border rounded-lg px-3 py-2"
             value={filters.status}
             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
             aria-label="Filter by vehicle status"
@@ -486,7 +466,7 @@ const FleetPage: React.FC = () => {
             <option value="Idle">Idle</option>
           </select>
           <select
-            className="border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
+            className="border rounded-lg px-3 py-2"
             value={filters.location}
             onChange={(e) => setFilters({ ...filters, location: e.target.value })}
             aria-label="Filter by vehicle location"
@@ -501,7 +481,7 @@ const FleetPage: React.FC = () => {
       </div>
 
       {/* Map */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 mb-6">
+      <div className="bg-white shadow rounded-xl p-4 mb-6">
         <h3 className="text-lg font-semibold mb-4">Live Fleet Locations</h3>
         <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: '400px', width: '100%' }}>
           <TileLayer
@@ -509,7 +489,7 @@ const FleetPage: React.FC = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           {filteredVehicles.map((vehicle) => (
-            <Marker key={vehicle.id} position={markerPositions[vehicle.id]}>
+            <Marker key={vehicle.id} position={[vehicle.lat, vehicle.lng]}>
               <Popup>
                 <div>
                   <h4 className="font-semibold">{vehicle.vehicleId} - {vehicle.type}</h4>
@@ -524,11 +504,11 @@ const FleetPage: React.FC = () => {
       </div>
 
       {/* Vehicle Table */}
-      <div className="bg-white dark:bg-gray-800 shadow rounded-xl p-4 overflow-x-auto">
+      <div className="bg-white shadow rounded-xl p-4 overflow-x-auto">
         <h3 className="text-lg font-semibold mb-4">Vehicles</h3>
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-100 dark:bg-gray-700 text-left text-sm">
+            <tr className="bg-gray-100 text-left text-sm">
               <th className="p-2 cursor-pointer" onClick={() => handleSort('vehicleId')}>
                 Vehicle ID {sortConfig?.key === 'vehicleId' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
               </th>
@@ -541,7 +521,7 @@ const FleetPage: React.FC = () => {
           </thead>
           <tbody>
             {filteredVehicles.map((v) => (
-              <tr key={v.id} className="border-t hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+              <tr key={v.id} className="border-t hover:bg-gray-50 transition">
                 <td className="p-2">{v.vehicleId}</td>
                 <td className="p-2">{v.type}</td>
                 <td className="p-2">
